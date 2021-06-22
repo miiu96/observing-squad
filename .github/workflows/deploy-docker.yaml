@@ -30,14 +30,26 @@ jobs:
             fi
             echo "$line" >> $GITHUB_ENV
           done < ${ENV_FILE}
-      - name: "Build node image"
-        run: |
-          cd ${GITHUB_WORKSPACE}/mainnet/ && docker image build . -t "${REGISTRY_HOSTNAME}/${NODE_TAG}" -f ./elrond-node-obs
-      - name: "Build proxy image"
-        run: |
-          cd ${GITHUB_WORKSPACE}/mainnet/ && docker image build . -t "${REGISTRY_HOSTNAME}/${PROXY_TAG}" -f ./elrond-proxy
-      - name: "Push images"
-        run: |
-          docker login --username miiu96 --password ${{ secrets.DOCKER_HUB_TOKEN }}
-          docker push "${REGISTRY_HOSTNAME}/${NODE_TAG}"
-          docker push "${REGISTRY_HOSTNAME}/${PROXY_TAG}"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: miiu96
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Build node image
+        uses: docker/build-push-action@v2
+        with:
+          context: ${GITHUB_WORKSPACE}/mainnet/
+          file: ${GITHUB_WORKSPACE}/mainnet/elrond-node-obs
+          push: true
+          tags: ${REGISTRY_HOSTNAME}/${NODE_TAG}
+          cache-from: type=registry,ref=miiu96/elrond-node-obs
+          cache-to: type=inline
+
