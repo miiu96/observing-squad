@@ -23,20 +23,20 @@ jobs:
       - name: "Import environment variables from a file"
         shell: bash
         run: |
-          END_FILE="${GITHUB_WORKSPACE}/mainnet/.env"
+          ENV_FILE="${GITHUB_WORKSPACE}/mainnet/.env"
           while read -r line; do
             if [[ "$line" != NODE_TAG* ]] && [[ "$line" != PROXY_TAG* ]] ; then
               continue
             fi
             echo "$line" >> $GITHUB_ENV
-          done < ${END_FILE}
+          done < ${ENV_FILE}
       - name: "Build node image"
         run: |
           cd ${GITHUB_WORKSPACE}/mainnet/ && docker image build . -t "${REGISTRY_HOSTNAME}/${NODE_TAG}" -f ./elrond-node-obs
       - name: "Build proxy image"
         run: |
           cd ${GITHUB_WORKSPACE}/mainnet/ && docker image build . -t "${REGISTRY_HOSTNAME}/${PROXY_TAG}" -f ./elrond-proxy
-      - name: "Push image"
+      - name: "Push images"
         run: |
           docker login --username miiu96 --password ${{ secrets.DOCKER_HUB_TOKEN }}
           docker push "${REGISTRY_HOSTNAME}/${NODE_TAG}"
