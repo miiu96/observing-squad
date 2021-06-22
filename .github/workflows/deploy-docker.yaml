@@ -43,10 +43,17 @@ jobs:
           username: miiu96
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      - name: Build node image
+      - name: Build and push node image
         uses: docker/build-push-action@v2
         with:
           file: ${{ env.GITHUB_WORKSPACE }}/mainnet/elrond-node-obs
           push: true
           tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.NODE_TAG }}
+
+      - name: Build and push proxy image
+        uses: docker/build-push-action@v2
+        with:
+          file: ${{ env.GITHUB_WORKSPACE }}/mainnet/elrond-proxy
+          push: true
+          tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.PROXY_TAG }}
 
