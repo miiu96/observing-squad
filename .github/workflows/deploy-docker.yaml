@@ -46,8 +46,8 @@ jobs:
       - name: Build node image
         uses: docker/build-push-action@v2
         with:
-          context: ${GITHUB_WORKSPACE}/mainnet/
-          file: ${GITHUB_WORKSPACE}/mainnet/elrond-node-obs
+          context: ${{ GITHUB_WORKSPACE }}/mainnet/
+          file: ${{ GITHUB_WORKSPACE }}/mainnet/elrond-node-obs
           push: true
           tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.NODE_TAG }}
           cache-from: type=registry,ref=miiu96/elrond-node-obs
