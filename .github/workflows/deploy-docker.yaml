@@ -25,21 +25,18 @@ jobs:
         id: import-env
         shell: bash
         run: |
-          END_FILE="${GITHUB_WORKSPACE}/mainnet/env"
-          echo ${END_FILE}
+          END_FILE="${GITHUB_WORKSPACE}/mainnet/.env"
           echo $(cat ${END_FILE})
           while read -r line; do
             if [ -z "$line" ]; then
               continue
             fi
             echo "$line" >> $GITHUB_ENV
-          done < ${{ env.ENV_FILE }}
+          done < ${END_FILE}
       - name: "Build image"
         run: |
-          TAG_VERSION=${{ steps.get_version.outputs.VERSION }}
-          cd ${GITHUB_WORKSPACE}/mainnet && docker build -t "${NODE_TAG}" -f -f ./elrond-node-obs
+          cd ${GITHUB_WORKSPACE}/mainnet && docker build -t "${REGISTRY_HOSTNAME}/${NODE_TAG}" -f -f ./elrond-node-obs
       - name: "Push image"
         run: |
           docker login --username miiu96 --password ${{ secrets.DOCKER_HUB_TOKEN }}
-          TAG_VERSION=${{ steps.get_version.outputs.VERSION }}
-          docker push "${NODE_TAG}"
+          docker push "${REGISTRY_HOSTNAME}/${NODE_TAG}"
