@@ -1,5 +1,4 @@
 env:
-  IMAGE_NODE: node-observer
   REGISTRY_HOSTNAME: miiu96
 
 name: Build Docker image & push
@@ -18,24 +17,27 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
 
     steps:
-      - name: Check out code into the Go module directory
+      - name: "Check out code"
         uses: actions/checkout@v2
 
-      - name: Import environment variables from a file
-        id: import-env
+      - name: "Import environment variables from a file"
         shell: bash
         run: |
           END_FILE="${GITHUB_WORKSPACE}/mainnet/.env"
           while read -r line; do
-            if [ -z "$line" ]; then
+            if [[ "$line" != NODE_TAG* ]] && [[ "$line" != PROXY_TAG* ]] ; then
               continue
             fi
             echo "$line" >> $GITHUB_ENV
           done < ${END_FILE}
-      - name: "Build image"
+      - name: "Build node image"
         run: |
           cd ${GITHUB_WORKSPACE}/mainnet/ && docker image build . -t "${REGISTRY_HOSTNAME}/${NODE_TAG}" -f ./elrond-node-obs
+      - name: "Build proxy image"
+        run: |
+          cd ${GITHUB_WORKSPACE}/mainnet/ && docker image build . -t "${REGISTRY_HOSTNAME}/${PROXY_TAG}" -f ./elrond-proxy
       - name: "Push image"
         run: |
           docker login --username miiu96 --password ${{ secrets.DOCKER_HUB_TOKEN }}
           docker push "${REGISTRY_HOSTNAME}/${NODE_TAG}"
+          docker push "${REGISTRY_HOSTNAME}/${PROXY_TAG}"
