@@ -26,6 +26,9 @@ jobs:
         shell: bash
         run: |
           while read line; do
+            if [ -z "$line" ]; then
+              continue
+            fi
             echo "$line" >> $GITHUB_ENV
           done < ${{ env.ENV_FILE }}
       - name: "Build image"
