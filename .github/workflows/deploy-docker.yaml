@@ -1,0 +1,39 @@
+env:
+  IMAGE_NODE: node-observer
+  REGISTRY_HOSTNAME: miiu96
+
+name: Build Docker image & push
+
+on:
+  push
+#on:
+#  release:
+#    types: [published]
+
+jobs:
+  build-docker-image:
+    strategy:
+      matrix:
+        runs-on: [ubuntu-latest]
+    runs-on: ${{ matrix.runs-on }}
+
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Import environment variables from a file
+        id: import-env
+        shell: bash
+        run: |
+          while read line; do
+            echo "$line" >> $GITHUB_ENV
+          done < ${{ env.ENV_FILE }}
+      - name: "Build image"
+        run: |
+          TAG_VERSION=${{ steps.get_version.outputs.VERSION }}
+          cd ${GITHUB_WORKSPACE}/mainnet && docker build -t "${NODE_TAG}" -f -f ./elrond-node-obs
+      - name: "Push image"
+        run: |
+          docker login --username miiu96 --password ${{ secrets.DOCKER_HUB_TOKEN }}
+          TAG_VERSION=${{ steps.get_version.outputs.VERSION }}
+          docker push "${NODE_TAG}"
