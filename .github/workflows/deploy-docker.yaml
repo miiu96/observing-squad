@@ -54,7 +54,7 @@ jobs:
       - name: Build and push proxy image
         uses: docker/build-push-action@v2
         with:
-          context: ${{ env.GITHUB_WORKSPACE }}/mainnet
+          context: ${{ GITHUB_WORKSPACE }}/mainnet
           file: ./elrond-proxy
           push: true
           tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.PROXY_TAG }}
