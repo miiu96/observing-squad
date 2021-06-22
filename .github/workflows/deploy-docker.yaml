@@ -46,7 +46,7 @@ jobs:
       - name: Build and push node image
         uses: docker/build-push-action@v2
         with:
-          context: ${GITHUB_WORKSPACE}/mainnet/
+          context: ./mainnet
           file: ./elrond-node-obs
           push: true
           tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.NODE_TAG }}
