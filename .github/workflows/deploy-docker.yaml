@@ -1,7 +1,7 @@
 env:
   REGISTRY_HOSTNAME: miiu96
 
-name: Build Docker image & push
+name: Build Docker images & push
 
 on:
   push
@@ -10,7 +10,7 @@ on:
 #    types: [published]
 
 jobs:
-  build-docker-image:
+  build-docker-images:
     strategy:
       matrix:
         runs-on: [ubuntu-latest]
@@ -53,6 +53,7 @@ jobs:
       - name: Build and push proxy image
         uses: docker/build-push-action@v2
         with:
+          context: ${{ env.GITHUB_WORKSPACE }}/mainnet/
           file: ${{ env.GITHUB_WORKSPACE }}/mainnet/elrond-proxy
           push: true
           tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.PROXY_TAG }}
